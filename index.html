@@ -1,0 +1,102 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BadBaeMemes Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        body { font-family: 'Inter', system-ui; }
+        .meme-grid { column-count: 1; }
+        @media (min-width: 640px) { .meme-grid { column-count: 2; } }
+        @media (min-width: 1024px) { .meme-grid { column-count: 3; } }
+        .meme-card { break-inside: avoid; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-bold tracking-tight mb-2" style="font-family: 'Space Grotesk', sans-serif;">BadBaeMemes</h1>
+            <p class="text-zinc-400 text-xl">Collection of memes by Brian (@PearzBreez)</p>
+        </header>
+
+        <div class="meme-grid gap-4" id="memeGrid">
+            <!-- Images will be injected by JS -->
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="fixed inset-0 bg-black/95 hidden flex items-center justify-center z-50">
+        <div class="relative max-w-4xl w-full px-4">
+            <button onclick="closeLightbox()" class="absolute -top-12 right-4 text-white text-4xl hover:text-zinc-400">×</button>
+            <img id="lightboxImg" class="max-h-[85vh] mx-auto rounded-xl shadow-2xl" alt="Meme">
+            
+            <div class="flex justify-center gap-6 mt-8">
+                <a href="#" id="twitterShare" target="_blank" class="flex items-center gap-2 text-white hover:text-sky-400">
+                    <i class="fa-brands fa-x-twitter"></i> <span>Post on X</span>
+                </a>
+                <button onclick="copyLink()" class="flex items-center gap-2 text-white hover:text-zinc-400">
+                    <i class="fa-solid fa-link"></i> <span>Copy Link</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const memes = [
+            {
+                id: '1RAXqdx5hoNQf2pWN2Q4appJcEhPOJMBT',
+                name: 'supermeme_1.png'
+            }
+            // More will be added as you send links
+        ];
+
+        function createMemeCard(meme) {
+            const div = document.createElement('div');
+            div.className = 'meme-card bg-zinc-900 rounded-2xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform';
+            div.innerHTML = `
+                <img src="https://drive.google.com/uc?id=${meme.id}" 
+                     class="w-full h-auto object-cover" 
+                     alt="${meme.name}" 
+                     loading="lazy">
+                <div class="p-4">
+                    <p class="text-sm text-zinc-400 truncate">${meme.name}</p>
+                </div>
+            `;
+            div.onclick = () => openLightbox(meme.id, meme.name);
+            return div;
+        }
+
+        function renderGallery() {
+            const grid = document.getElementById('memeGrid');
+            grid.innerHTML = '';
+            memes.forEach(meme => {
+                grid.appendChild(createMemeCard(meme));
+            });
+        }
+
+        function openLightbox(id, name) {
+            document.getElementById('lightboxImg').src = `https://drive.google.com/uc?id=${id}`;
+            document.getElementById('lightbox').classList.remove('hidden');
+            document.getElementById('twitterShare').href = `https://twitter.com/intent/tweet?text=Check%20out%20this%20meme!%20%40PearzBreez&url=https://Caelverum.github.io/badbaememes-gallery`;
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText('https://Caelverum.github.io/badbaememes-gallery');
+            alert('Link copied! Share it anywhere 💪');
+        }
+
+        // Close lightbox with ESC
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        window.onload = renderGallery;
+    </script>
+</body>
+</html>
