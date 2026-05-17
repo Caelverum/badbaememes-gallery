@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,86 +9,92 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap');
         body { font-family: 'Inter', system-ui; }
-        .meme-grid { column-count: 1; }
+        .meme-grid {
+            column-count: 1;
+            column-gap: 1.5rem;
+        }
         @media (min-width: 640px) { .meme-grid { column-count: 2; } }
         @media (min-width: 1024px) { .meme-grid { column-count: 3; } }
-        .meme-card { break-inside: avoid; }
+        .meme-card { 
+            break-inside: avoid; 
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
-<body class="bg-zinc-950 text-white">
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="text-5xl font-bold tracking-tight mb-2" style="font-family: 'Space Grotesk', sans-serif;">BadBaeMemes</h1>
-            <p class="text-zinc-400 text-xl">Collection of memes by Brian (@PearzBreez)</p>
+<body class="bg-zinc-950 text-white min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <header class="text-center mb-16">
+            <h1 class="text-6xl font-bold tracking-tighter mb-3" style="font-family: 'Space Grotesk', sans-serif;">BadBaeMemes</h1>
+            <p class="text-zinc-400 text-2xl">Collection of memes by Brian (@PearzBreez)</p>
+            <p class="text-emerald-400 mt-2">Made with Grok Imagine • Hosted forever on GitHub</p>
         </header>
 
-        <div class="meme-grid gap-4" id="memeGrid">
-            <!-- Images will be injected by JS -->
-        </div>
+        <div class="meme-grid" id="memeGrid"></div>
     </div>
 
     <!-- Lightbox -->
-    <div id="lightbox" class="fixed inset-0 bg-black/95 hidden flex items-center justify-center z-50">
-        <div class="relative max-w-4xl w-full px-4">
-            <button onclick="closeLightbox()" class="absolute -top-12 right-4 text-white text-4xl hover:text-zinc-400">×</button>
-            <img id="lightboxImg" class="max-h-[85vh] mx-auto rounded-xl shadow-2xl" alt="Meme">
+    <div id="lightbox" class="fixed inset-0 bg-black/95 hidden flex items-center justify-center z-50 p-4">
+        <div class="relative max-w-4xl w-full">
+            <button onclick="closeLightbox()" class="absolute -top-14 right-4 text-white text-5xl hover:text-zinc-300">×</button>
+            <img id="lightboxImg" class="max-h-[85vh] w-full object-contain rounded-2xl shadow-2xl" alt="Meme">
             
-            <div class="flex justify-center gap-6 mt-8">
-                <a href="#" id="twitterShare" target="_blank" class="flex items-center gap-2 text-white hover:text-sky-400">
-                    <i class="fa-brands fa-x-twitter"></i> <span>Post on X</span>
+            <div class="flex justify-center gap-8 mt-8 text-lg">
+                <a href="#" id="twitterShare" target="_blank" class="flex items-center gap-3 hover:text-sky-400 transition">
+                    <i class="fa-brands fa-x-twitter"></i> Post on X
                 </a>
-                <button onclick="copyLink()" class="flex items-center gap-2 text-white hover:text-zinc-400">
-                    <i class="fa-solid fa-link"></i> <span>Copy Link</span>
+                <button onclick="copyLink()" class="flex items-center gap-3 hover:text-zinc-300 transition">
+                    <i class="fa-solid fa-link"></i> Copy Link
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        const memes = [
-            {
-                id: '1RAXqdx5hoNQf2pWN2Q4appJcEhPOJMBT',
-                name: 'supermeme_1.png'
-            },
-            {
-                id: '15Xy1UCEkRrKvaVD6puPgHN5wrVBr7eu_',
-                name: 'supermeme_2.png'
-            },
-            {
-                id: '1b8clbTQ1cnM9wQq_U9ij3_xzkMQCSrRp',
-                name: 'supermeme_3.png'
-            }
-            // More will be added as you send links
+        const memeFiles = [
+            "supermeme_7h36_18.png",
+            "supermeme_7h39_19.png",
+            "supermeme_7h44_10.png",
+            "supermeme_7h52_1.png",
+            "supermeme_7h54_53.png",
+            "supermeme_8h12_1.png",
+            "supermeme_8h16_28.png",
+            "supermeme_8h18_43.png",
+            "supermeme_8h19_42.png",
+            "supermeme_8h26_34.png",
+            "supermeme_8h40_26.png",
+            "supermeme_8h48_0.png",
+            "supermeme_8h5_19.png",
+            "supermeme_8h9_19.png",
+            "supermeme_9h3_0.png"
+            // Add new filenames here when you upload more
         ];
 
-        function createMemeCard(meme) {
-            const div = document.createElement('div');
-            div.className = 'meme-card bg-zinc-900 rounded-2xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform';
-            div.innerHTML = `
-                <img src="https://drive.google.com/uc?id=${meme.id}" 
-                     class="w-full h-auto object-cover" 
-                     alt="${meme.name}" 
-                     loading="lazy">
-                <div class="p-4">
-                    <p class="text-sm text-zinc-400 truncate">${meme.name}</p>
-                </div>
-            `;
-            div.onclick = () => openLightbox(meme.id, meme.name);
-            return div;
-        }
-
-        function renderGallery() {
+        function loadMemes() {
             const grid = document.getElementById('memeGrid');
             grid.innerHTML = '';
-            memes.forEach(meme => {
-                grid.appendChild(createMemeCard(meme));
+
+            memeFiles.forEach(filename => {
+                const card = document.createElement('div');
+                card.className = 'meme-card bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-all duration-300 shadow-xl';
+                card.innerHTML = `
+                    <img src="${filename}" 
+                         class="w-full h-auto object-cover" 
+                         alt="${filename}"
+                         loading="lazy"
+                         onerror="this.parentElement.style.display='none'; console.log('Failed to load: ${filename}');">
+                    <div class="p-4 text-center">
+                        <p class="text-zinc-400 text-sm">${filename}</p>
+                    </div>
+                `;
+                card.onclick = () => openLightbox(filename);
+                grid.appendChild(card);
             });
         }
 
-        function openLightbox(id, name) {
-            document.getElementById('lightboxImg').src = `https://drive.google.com/uc?id=${id}`;
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
             document.getElementById('lightbox').classList.remove('hidden');
-            document.getElementById('twitterShare').href = `https://twitter.com/intent/tweet?text=Check%20out%20this%20meme!%20%40PearzBreez&url=https://Caelverum.github.io/badbaememes-gallery`;
+            document.getElementById('twitterShare').href = `https://twitter.com/intent/tweet?text=Check%20out%20this%20BadBaeMeme%20by%20@PearzBreez!&url=https://Caelverum.github.io/badbaememes-gallery`;
         }
 
         function closeLightbox() {
@@ -96,15 +103,14 @@
 
         function copyLink() {
             navigator.clipboard.writeText('https://Caelverum.github.io/badbaememes-gallery');
-            alert('Link copied! Share it anywhere 💪');
+            alert('✅ Link copied! Share your gallery 💪');
         }
 
-        // Close lightbox with ESC
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') closeLightbox();
         });
 
-        window.onload = renderGallery;
+        window.onload = loadMemes;
     </script>
 </body>
 </html>
